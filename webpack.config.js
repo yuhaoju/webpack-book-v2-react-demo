@@ -8,14 +8,18 @@ module.exports = () => {
   return {
     entry: {
       index: {
-        import: './src/index.jsx',
+        import: './src/index.tsx',
         dependOn: 'shared',
       },
       details: {
-        import: './src/details.jsx',
+        import: './src/details.tsx',
         dependOn: 'shared',
       },
       shared: ['react', 'react-dom'],
+    },
+    output: {
+      chunkFilename: isProduction ? '[name].[chunkhash:8].chunk.js' : '[name].chunk.js',
+      filename: isProduction ? '[name].[chunkhash:8].js' : '[name].js',
     },
     devServer: {
       open: true,
@@ -24,6 +28,11 @@ module.exports = () => {
     mode: isProduction ? 'production' : 'development',
     module: {
       rules: [
+        {
+          test: /\.tsx?$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
@@ -55,7 +64,7 @@ module.exports = () => {
       ]
     },
     resolve: {
-      extensions: ['.js', '.jsx', '.less'],
+      extensions: ['.js', '.jsx', '.tsx', '.less'],
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -69,8 +78,8 @@ module.exports = () => {
         chunks: ['shared', 'details'],
       }),
       isProduction ? new MiniCssExtractPlugin({
-        filename: '[name].css',
-        chunkFilename: '[name].chunk.css',
+        filename: '[name].[contenthash:8].css',
+        chunkFilename: '[name].[contenthash:8].chunk.css',
       }) : null
     ].filter(Boolean)
   };
